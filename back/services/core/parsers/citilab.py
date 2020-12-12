@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 
 from back.services.core.parsers.response_handler import send_request
 
+PRICE = 1980
+TIME_TILL_RES_DAYS = 3
 
 def get_cites() -> dict:
     response = send_request(url=f'https://citilab.ru/local/components/reaspekt/reaspekt.geoip/'
@@ -33,7 +35,10 @@ def parse_citilab() -> NoReturn:
             print(f"Город : {city}\n"
                   f"Корона : {place['covid']}\n"
                   f"Адрес: {place['adr']}\n"
-                  f"Координаты: {place['lat']} : {place['lng']}")
+                  f"Координаты: {place['lat']} : {place['lng']}\n"
+                  f"Цена: {PRICE}\n"
+                  f"Срок готовности результатов: {TIME_TILL_RES_DAYS}")
+
             print('--------')
 
 
