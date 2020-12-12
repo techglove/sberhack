@@ -22,7 +22,7 @@ def get_cites() -> dict:
 
 def parse_citilab() -> NoReturn:
     db_pusher = TestPlacePusher(DB_HOST, DB_LOGIN, DB_PASSWORD, DB_DATABASE)
-    med_org = db_pusher.get_or_add_med_org('Citilab')
+    db_pusher.get_or_add_med_org('Citilab')
     cites = get_cites()
     for code, city in cites.items():
         db_pusher.get_or_add_city(city)
