@@ -1,8 +1,10 @@
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Float, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from geoalchemy2 import Geography
+from sqlalchemy.sql.expression import cast
+from geoalchemy2 import Geography, Geometry
+from geoalchemy2.shape import to_shape
 import argparse
 
 Base = declarative_base()
@@ -51,6 +53,26 @@ class Tests(Base):
     is_urgent = Column(Boolean)
     options = Column(String)
 
+
+class DatabaseReader:
+    def __init__(self, host, user, password, database):
+        self.engine = sqlalchemy.create_engine("postgresql+psycopg2://{}:{}@{}/{}".format(user, password, host, database))
+        Session.configure(bind=self.engine)
+        self.session = Session()
+
+    def get_places_in_rect(self, rect):
+        places = self.session.query(TestPlace).filter(func.ST_Contains(func.ST_MakeEnvelope(rect[0], rect[1], rect[2], rect[3], 4326), cast(TestPlace.coord, Geometry)))
+        return [place for place in places]
+
+    def convert_point_to_lat_lon(self, point):
+        shape = to_shape(point)
+        return {'lat': shape.y, 'lon': shape.x}
+
+    def get_cities(self, cities_ids):
+        return [city for city in self.session.query(City).filter(City.id.in_(cities_ids))]
+
+    def get_orgs(self, orgs_ids):
+        return [org for org in self.session.query(MedOrganisation).filter(MedOrganisation.id.in_(orgs_ids))]
 
 class TestPlacePusher:
     def __init__(self, host, user, password, database):
