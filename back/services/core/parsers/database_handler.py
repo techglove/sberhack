@@ -2,6 +2,7 @@ import sqlalchemy
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from geoalchemy2 import Geography
 import argparse
 
 Base = declarative_base()
@@ -31,8 +32,7 @@ class TestPlace(Base):
     org_id = Column(Integer, ForeignKey('med_organisations.id'))
     city_id = Column(Integer, ForeignKey('cities.id'))
     address = Column(String)
-    position_lat = Column(Float)
-    position_lon = Column(Float)
+    coord = Column(Geography('POINT'))
     price = Column(String)
     url = Column(String)
     is_urgent = Column(Boolean)
@@ -71,8 +71,7 @@ class TestPlacePusher:
             org_id = org_id,
             city_id = city_id,
             address = address,
-            position_lat = position['lat'],
-            position_lon = position['lon'],
+            coord = 'POINT({} {})'.format(position['lat'], position['lon']),
             url = url,
             price = price,
             is_urgent = is_urgent
