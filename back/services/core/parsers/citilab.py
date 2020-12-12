@@ -5,6 +5,7 @@ from typing import NoReturn
 from bs4 import BeautifulSoup
 
 from back.services.core.parsers.response_handler import send_request
+from back.services.core.parsers.database_handler import TestPlacePusher
 
 PRICE = 1980
 TIME_TILL_RES_DAYS = 3
@@ -19,8 +20,13 @@ def get_cites() -> dict:
 
 
 def parse_citilab() -> NoReturn:
+    # TODO придумать откуда брать данные
+    db_pusher = TestPlacePusher('host', 'user', 'password', 'database')
+    med_org = db_pusher.get_or_add_med_org('Citilab')
     cites = get_cites()
     for code, city in cites.items():
+        db_pusher.get_or_add_city(city)
+
         response = send_request(url=f'https://citilab.ru/{code}/medcentres/', payload={}, return_json=False)
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -31,14 +37,20 @@ def parse_citilab() -> NoReturn:
 
         json_data_raw = re.findall('(?<=var jsonData = ).*$', data)[0][:-1].replace('\'', '"')
         json_data = json.loads(json_data_raw)
+
         for place in json_data.get('mark'):
+            if place['covid'] != '1':
+                continue
+            address = place['adr']
+            coord = {'lat': place['lat'], 'log': place['lng']}
+            url = f'https://citilab.ru/{place["url"]}'
+            db_pusher.add_test_place(city=city, med_org=med_org, address=address, position=coord, url=url)
             print(f"Город : {city}\n"
                   f"Корона : {place['covid']}\n"
                   f"Адрес: {place['adr']}\n"
                   f"Координаты: {place['lat']} : {place['lng']}\n"
                   f"Цена: {PRICE}\n"
                   f"Срок готовности результатов: {TIME_TILL_RES_DAYS}")
-
             print('--------')
 
 
