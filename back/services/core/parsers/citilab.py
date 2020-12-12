@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 from back.services.core.parsers.response_handler import send_request
 from back.services.core.parsers.database_handler import TestPlacePusher
+from back.settings import DB_HOST, DB_LOGIN, DB_DATABASE, DB_PASSWORD
 
 PRICE = 1980
 TIME_TILL_RES_DAYS = 3
@@ -20,8 +21,7 @@ def get_cites() -> dict:
 
 
 def parse_citilab() -> NoReturn:
-    # TODO придумать откуда брать данные
-    db_pusher = TestPlacePusher('host', 'user', 'password', 'database')
+    db_pusher = TestPlacePusher(DB_HOST, DB_LOGIN, DB_PASSWORD, DB_DATABASE)
     med_org = db_pusher.get_or_add_med_org('Citilab')
     cites = get_cites()
     for code, city in cites.items():
