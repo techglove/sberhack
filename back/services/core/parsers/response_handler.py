@@ -37,14 +37,16 @@ def get_useragent() -> str:
     return random_user_agent
 
 
-def send_request(url: str, payload: dict) -> json:
+def send_request(url: str, payload: dict, return_json: bool=True) -> json:
     session = requests.Session()
     session.headers.update({'Content-Type': 'application/json'})
     session.headers.update({'User-Agent': get_useragent()})
     response = requests_retry_session(session=session).get(url=url, data=json.dumps(payload))
 
     if response.status_code != 200:
-        logging.error(f'paykassma response: {response.status_code} msg: {response.text}')
+        logging.error(f'response: {response.status_code} msg: {response.text}')
         return None
-    else:
+    elif return_json:
         return response.json()
+    else:
+        return response
