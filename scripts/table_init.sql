@@ -1,6 +1,8 @@
 DROP TABLE test_places;
+DROP TABLE tests;
 DROP TABLE med_organisations;
 DROP TABLE cities;
+DROP TABLE test_type;
 
 CREATE TABLE med_organisations (
     id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -41,8 +43,8 @@ CREATE TABLE tests (
     org_id integer,
     price varchar(1000),
     is_urgent boolean,
-    options varchar(1000)
-    CONSTRAINT fk_org_id,
+    options varchar(1000),
+    CONSTRAINT fk_org_id
         FOREIGN KEY(org_id)
 	    REFERENCES med_organisations(id),
 
