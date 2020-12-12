@@ -65,7 +65,7 @@ class DatabaseReader:
         query = query.filter(func.ST_Contains(func.ST_MakeEnvelope(rect[0], rect[1], rect[2], rect[3], 4326), cast(TestPlace.coord, Geometry)))
         if sort_close_to is not None:
             query = query.order_by(func.ST_DistanceSphere(func.ST_GeomFromText('POINT({} {} 4326)'.format(sort_close_to[0], sort_close_to[1])),cast(TestPlace.coord, Geometry),))
-        places = query
+        places = query.limit(100)
         return [place for place in places]
 
     def convert_point_to_lat_lon(self, point):
