@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 from back.services.core.parsers.response_handler import send_request
 from back.services.core.parsers.database_handler import TestPlacePusher
-from back.settings import DB_HOST, DB_LOGIN, DB_DATABASE, DB_PASSWORD
+from back.services.core.settings import DB_HOST, DB_LOGIN, DB_DATABASE, DB_PASSWORD
 
 PRICE = 1980
 TIME_TILL_RES_DAYS = 3
