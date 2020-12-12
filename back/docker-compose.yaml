@@ -1,12 +1,20 @@
-version: '3.7'
+version: '3.5'
 
 services:
   core:
-    build: ./services/core
-    command: python manage.py run -h 0.0.0.0 -p 8080
-    volumes:
-      - ./services/core/:/usr/src/app/
-    ports:
-      - 8080:8080
+    build:
+      context: ./services/core
+      dockerfile: Dockerfile.prod
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    image: swr.ru-moscow-1.hc.sbercloud.ru/techglove/api_core
+    expose:
+      - 5000
     env_file:
-      - ./.env.dev
+      - ./.env.prod
+  nginx:
+    build: ./services/nginx
+    image: swr.ru-moscow-1.hc.sbercloud.ru/techglove/api_nginx
+    ports:
+      - 8081:80
+    depends_on:
+      - core

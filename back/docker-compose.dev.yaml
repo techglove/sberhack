@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  core:
+    build: ./services/core
+    command: python manage.py run -h 0.0.0.0 -p 8080
+    volumes:
+      - ./services/core/:/usr/src/app/
+    ports:
+      - 8080:8080
+    env_file:
+      - ./.env.dev
