@@ -29,3 +29,24 @@ CREATE TABLE test_places (
         FOREIGN KEY(city_id)
 	    REFERENCES cities(id)
 );
+
+CREATE TABLE test_type (
+    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    type  varchar(1000)
+);
+
+CREATE TABLE tests (
+    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    type_id integer,
+    org_id integer,
+    price varchar(1000),
+    is_urgent boolean,
+    options varchar(1000)
+    CONSTRAINT fk_org_id,
+        FOREIGN KEY(org_id)
+	    REFERENCES med_organisations(id),
+
+    CONSTRAINT fk_type_id
+        FOREIGN KEY(type_id)
+	    REFERENCES test_type(id)
+);

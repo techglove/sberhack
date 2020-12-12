@@ -33,9 +33,23 @@ class TestPlace(Base):
     city_id = Column(Integer, ForeignKey('cities.id'))
     address = Column(String)
     coord = Column(Geography('POINT'))
-    price = Column(String)
     url = Column(String)
+
+
+class TestType(Base):
+    __tablename__ = 'test_type'
+    id = Column(Integer, primary_key=True)
+    type = Column(String)
+
+
+class Tests(Base):
+    __tablename__ = 'tests'
+    id = Column(Integer, primary_key=True)
+    type_id = Column(Integer, ForeignKey('test_type.id'))
+    org_id = Column(Integer, ForeignKey('med_organisations.id'))
+    price = Column(String)
     is_urgent = Column(Boolean)
+    options = Column(String)
 
 
 class TestPlacePusher:
