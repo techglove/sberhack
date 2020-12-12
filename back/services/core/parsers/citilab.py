@@ -42,7 +42,7 @@ def parse_citilab() -> NoReturn:
             if place['covid'] != '1':
                 continue
             address = place['adr']
-            coord = {'lat': place['lat'], 'log': place['lng']}
+            coord = {'lat': place['lat'], 'lon': place['lng']}
             url = f'https://citilab.ru/{place["url"]}'
             db_pusher.add_test_place(city=city, med_org='Citilab', address=address, position=coord, url=url)
             print(f"Город : {city}\n"
