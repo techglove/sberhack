@@ -18,6 +18,8 @@ CREATE TABLE test_places (
     city_id integer,
     address varchar(1000),
     position point NOT NULL,
+    position_lat REAL,
+    position_lon REAL,
     price varchar(1000),
     url varchar(1000),
     is_urgent boolean,
