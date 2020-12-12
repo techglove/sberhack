@@ -78,7 +78,7 @@ class TestPlacePusher:
             self.session.commit()
             return org.id
 
-    def add_test_place(self, city, med_org, address, position, url, price, is_urgent=False):
+    def add_test_place(self, city, med_org, address, position, url):
         city_id = self.get_or_add_city(city)
         org_id = self.get_or_add_med_org(med_org)
         test_place = TestPlace(
@@ -87,8 +87,6 @@ class TestPlacePusher:
             address = address,
             coord = 'POINT({} {})'.format(position['lat'], position['lon']),
             url = url,
-            price = price,
-            is_urgent = is_urgent
         )
 
         self.session.add(test_place)
