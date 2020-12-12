@@ -92,6 +92,22 @@ class TestPlacePusher:
         self.session.add(test_place)
         self.session.commit()
 
+    def add_test_type(self, type: str):
+        test_place = TestType(type=type)
+        self.session.add(test_place)
+        self.session.commit()
+
+    def add_test(self, type_id: int, org_id: int, price: str, is_urgent: bool, options: str):
+        test = Tests(
+            type_id=type_id,
+            org_id=org_id,
+            price=price,
+            is_urgent=is_urgent,
+            options=options
+        )
+        self.session.add(test)
+        self.session.commit()
+
 
 def test_inserter():
     parser = argparse.ArgumentParser()
