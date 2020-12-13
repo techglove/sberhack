@@ -31,10 +31,11 @@ def get_orgs(places):
 
 def filter_test_type(places, required_test_type):
     filter_func = lambda x: x.pcr_test_price is not None or x.antibodies_test_price is not None
+
     if required_test_type == 1:
-        filter_func = lambda x: x.pcr_test_price is not None and x.pcr_test_price > 0
+        filter_func = lambda x: x.pcr_test_price is not None
     elif required_test_type == 2:
-        filter_func = lambda x: x.antibodies_test_price is not None and x.antibodies_test_price > 0
+        filter_func = lambda x: x.antibodies_test_price is not None
     return [place for place in places if filter_func(place)]
 
 
