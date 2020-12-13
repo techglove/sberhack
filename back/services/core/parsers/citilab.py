@@ -28,7 +28,7 @@ def parse_citilab() -> NoReturn:
     for code, city in cites.items():
         db_pusher.get_or_add_city(city)
 
-        response = send_request(url=f'https://citilab.ru{code}/medcentres/', payload={}, return_json=False)
+        response = send_request(url=f'https://citilab.ru/{code}/medcentres/', payload={}, return_json=False)
         soup = BeautifulSoup(response.text, 'html.parser')
 
         try:
@@ -44,7 +44,7 @@ def parse_citilab() -> NoReturn:
                 continue
             address = place['adr']
             coord = {'lat': place['lat'], 'lon': place['lng']}
-            url = f'https://citilab.ru/{place["url"]}'
+            url = f'https://citilab.ru{place["url"]}'
             db_pusher.add_test_place(city=city, med_org='Citilab', address=address, position=coord, url=url,
                                      pcr_test_price=PRICE_PCR,
                                      antibodies_test_price=ANTIBODIES_TEST_PRICE,
