@@ -63,6 +63,18 @@ class DatabaseReader:
         Session.configure(bind=self.engine)
         self.session = Session()
 
+    def get_all_places(self, city, position = None):
+        query = self.session.query(TestPlace)
+        if city:
+            req_city_id = self.get_city_by_name(city)
+            query = query.filter_by(city_id=req_city_id)
+
+        if position is not None:
+            query = query.order_by(func.ST_DistanceSphere(func.ST_GeomFromText('POINT({} {} 4326)'.format(position[0], position[1])), cast(TestPlace.coord, Geometry),))
+
+        places = query.limit(1000)
+        return [place for place in places]
+
     def get_places_in_rect(self, rect, sort_close_to = None):
         query = self.session.query(TestPlace)
         query = query.filter(func.ST_Contains(func.ST_MakeEnvelope(rect[0], rect[1], rect[2], rect[3], 4326), cast(TestPlace.coord, Geometry)))
@@ -74,6 +86,12 @@ class DatabaseReader:
     def convert_point_to_lat_lon(self, point):
         shape = to_shape(point)
         return {'lat': shape.y, 'lon': shape.x}
+
+    def get_city_by_name(self, city_name):
+        return self.session.query(City).filter_by(name=city_name).first()
+
+    def get_org_by_name(self, org_name):
+        return self.session.query(MedOrganisation).filter_by(name=org_name).first()
 
     def get_cities(self, cities_ids):
         return [city for city in self.session.query(City).filter(City.id.in_(cities_ids))]
