@@ -24,8 +24,35 @@ def get_orgs(places):
     response = {}
     for org in orgs:
         response[org.id] = org.name
-    print(response)
     return response
+
+def output_place(place, orgs, cities):
+    return {
+        'organisation': orgs[place.org_id] if place.org_id in orgs else "Unknown",
+        'city': cities[place.city_id] if place.city_id in cities else "Unknown",
+        'address':place.address,
+        'coord':database_reader.convert_point_to_lat_lon(place.coord),
+        'url':place.url,
+        'pcr_test_price': place.pcr_test_price,
+        'antibodies_test_price': place.antibodies_test_price,
+        'time_of_completion': place.time_of_completion,
+    }
+
+
+@app.route('/list_all', methods=['GET'])
+def list_all():
+    try:
+        city = request.args.get('city')
+        places = database_reader.get_all_places(city)
+        cities = get_cities(places)
+        orgs = get_orgs(places)
+        response = jsonify(
+            ok=True,
+            places=[output_place(place, orgs, cities) for place in places]
+        )
+        return response, 200
+    except:
+        return jsonify(ok=False, message="Server internal error"), 500
 
 @app.route('/list', methods=['GET'])
 def list_places():
@@ -48,18 +75,7 @@ def list_places():
         orgs = get_orgs(places)
         response = jsonify(
             ok=True,
-            places=[
-                {
-                    'organisation': orgs[place.org_id] if place.org_id in orgs else "Unknown",
-                    'city': cities[place.city_id] if place.city_id in cities else "Unknown",
-                    'address':place.address,
-                    'coord':database_reader.convert_point_to_lat_lon(place.coord),
-                    'url':place.url,
-                    'pcr_test_price': place.pcr_test_price,
-                    'antibodies_test_price': place.antibodies_test_price,
-                    'time_of_completion': place.time_of_completion,
-                } for place in places
-            ]
+            places=[output_place(place, orgs, cities) for place in places]
         )
         return response, 200
     except:
