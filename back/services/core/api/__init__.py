@@ -1,11 +1,13 @@
 import os
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from parsers.database_handler import DatabaseReader
 from settings import DB_HOST, DB_LOGIN, DB_DATABASE, DB_PASSWORD
 
 
 app = Flask(__name__)
+CORS(app)
 
 database_reader = DatabaseReader(DB_HOST, DB_LOGIN, DB_PASSWORD, DB_DATABASE)
 
