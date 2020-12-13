@@ -29,6 +29,14 @@ def get_orgs(places):
         response[org.id] = org.name
     return response
 
+def filter_test_type(places, required_test_type):
+    filter_func = lambda x: x.pcr_test_price is not None or x.antibodies_test_price is not None
+    if required_test_type == 1:
+        filter_func = lambda x: x.pcr_test_price is not None and x.pcr_test_price > 0
+    elif required_test_type == 2:
+        filter_func = lambda x: x.antibodies_test_price is not None and x.antibodies_test_price > 0
+    return [place for place in places if filter_func(place)]
+
 
 def output_place(place, orgs, cities):
     return {
@@ -48,6 +56,7 @@ def list_all():
     try:
         city = request.args.get('city')
         position_str = request.args.get('position')
+        analyse_type_str = request.args.get('analyse_type')
         position_coords = None
         if position_str:
             position_coords = [float(x) for x in position_str.split(',')]
@@ -55,6 +64,12 @@ def list_all():
                 return jsonify(ok=False, message="position should be in format 'lon0,lat0'"), 400
 
         places = database_reader.get_all_places(city, position_coords)
+        if analyse_type_str:
+            try:
+                analyse_type = int(analyse_type_str)
+                places = filter_test_type(places, analyse_type)
+            except:
+                pass
         cities = get_cities(places)
         orgs = get_orgs(places)
         response = jsonify(
@@ -73,6 +88,7 @@ def list_places():
         sort = request.args.get('sort')
         position_str = request.args.get('position')
         distance_str = request.args.get('distance')
+        analyse_type_str = request.args.get('analyse_type')
         position_coords = None
         viewport_coords = None
         distance = 100000
@@ -107,6 +123,13 @@ def list_places():
 
         if len(places) == 0:
             return jsonify(ok=True, places=[]), 404
+
+        if analyse_type_str:
+            try:
+                analyse_type = int(analyse_type_str)
+                places = filter_test_type(places, analyse_type)
+            except:
+                pass
         cities = get_cities(places)
         orgs = get_orgs(places)
         response = jsonify(
