@@ -8,8 +8,9 @@ from back.services.core.parsers.response_handler import send_request
 from back.services.core.parsers.database_handler import TestPlacePusher
 from back.services.core.settings import DB_HOST, DB_LOGIN, DB_DATABASE, DB_PASSWORD
 
-PRICE = 1980
-TIME_TILL_RES_DAYS = 3
+PRICE_PCR = '1980'
+ANTIBODIES_TEST_PRICE = '850'
+TIME_TILL_RES_DAYS = '3 дня'
 
 def get_cites() -> dict:
     response = send_request(url=f'https://citilab.ru/local/components/reaspekt/reaspekt.geoip/'
@@ -27,7 +28,7 @@ def parse_citilab() -> NoReturn:
     for code, city in cites.items():
         db_pusher.get_or_add_city(city)
 
-        response = send_request(url=f'https://citilab.ru/{code}/medcentres/', payload={}, return_json=False)
+        response = send_request(url=f'https://citilab.ru{code}/medcentres/', payload={}, return_json=False)
         soup = BeautifulSoup(response.text, 'html.parser')
 
         try:
@@ -44,12 +45,15 @@ def parse_citilab() -> NoReturn:
             address = place['adr']
             coord = {'lat': place['lat'], 'lon': place['lng']}
             url = f'https://citilab.ru/{place["url"]}'
-            db_pusher.add_test_place(city=city, med_org='Citilab', address=address, position=coord, url=url)
+            db_pusher.add_test_place(city=city, med_org='Citilab', address=address, position=coord, url=url,
+                                     pcr_test_price=PRICE_PCR,
+                                     antibodies_test_price=ANTIBODIES_TEST_PRICE,
+                                     time_of_completion=TIME_TILL_RES_DAYS)
             print(f"Город : {city}\n"
                   f"Корона : {place['covid']}\n"
                   f"Адрес: {place['adr']}\n"
                   f"Координаты: {place['lat']} : {place['lng']}\n"
-                  f"Цена: {PRICE}\n"
+                  f"Цена: {PRICE_PCR}\n"
                   f"Срок готовности результатов: {TIME_TILL_RES_DAYS}")
             print('--------')
 

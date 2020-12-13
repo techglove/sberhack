@@ -36,6 +36,9 @@ class TestPlace(Base):
     address = Column(String)
     coord = Column(Geography('POINT'))
     url = Column(String)
+    pcr_test_price = Column(String)
+    antibodies_test_price = Column(String)
+    time_of_completion = Column(String)
 
 
 class TestType(Base):
@@ -104,15 +107,18 @@ class TestPlacePusher:
             self.session.commit()
             return org.id
 
-    def add_test_place(self, city, med_org, address, position, url):
+    def add_test_place(self, city, med_org, address, position, url, pcr_test_price, antibodies_test_price, time_of_completion):
         city_id = self.get_or_add_city(city)
         org_id = self.get_or_add_med_org(med_org)
         test_place = TestPlace(
-            org_id = org_id,
-            city_id = city_id,
-            address = address,
-            coord = 'POINT({} {})'.format(position['lat'], position['lon']),
-            url = url,
+            org_id=org_id,
+            city_id=city_id,
+            address=address,
+            coord='POINT({} {})'.format(position['lat'], position['lon']),
+            url=url,
+            pcr_test_price=pcr_test_price,
+            antibodies_test_price=antibodies_test_price,
+            time_of_completion=time_of_completion
         )
 
         self.session.add(test_place)
