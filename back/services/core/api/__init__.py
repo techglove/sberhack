@@ -55,12 +55,14 @@ def list_places():
                     'address':place.address,
                     'coord':database_reader.convert_point_to_lat_lon(place.coord),
                     'url':place.url,
+                    'pcr_test_price': place.pcr_test_price,
+                    'antibodies_test_price': place.antibodies_test_price,
+                    'time_of_completion': place.time_of_completion,
                 } for place in places
             ]
         )
         return response, 200
     except:
-        raise
         return jsonify(ok=False, message="Server internal error"), 500
 
 @app.route('/')

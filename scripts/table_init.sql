@@ -20,9 +20,10 @@ CREATE TABLE test_places (
     city_id integer,
     address varchar(1000),
     coord geography(POINT),
-    price varchar(1000),
+    pcr_test_price varchar(1000),
+    antibodies_test_price varchar(1000),
+    time_of_completion varchar(1000),
     url varchar(1000),
-    is_urgent boolean,
     CONSTRAINT fk_org_id
         FOREIGN KEY(org_id)
 	    REFERENCES med_organisations(id),
