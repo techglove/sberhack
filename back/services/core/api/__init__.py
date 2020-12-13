@@ -43,7 +43,14 @@ def output_place(place, orgs, cities):
 def list_all():
     try:
         city = request.args.get('city')
-        places = database_reader.get_all_places(city)
+        position_str = request.args.get('position')
+        position_coords = None
+        if position_str:
+            position_coords = [float(x) for x in position_str.split(',')]
+            if len(position_coords) != 2:
+                return jsonify(ok=False, message="position should be in format 'lon0,lat0'"), 400
+
+        places = database_reader.get_all_places(city, position_coords)
         cities = get_cities(places)
         orgs = get_orgs(places)
         response = jsonify(
@@ -59,16 +66,39 @@ def list_places():
     try:
         viewport_str = request.args.get('viewport')
         sort = request.args.get('sort')
-        if not viewport_str:
-            return jsonify(ok=False, message="viewport arg required"), 400
-        viewport_coords = [float(x) for x in viewport_str.split(',')]
-        if not viewport_coords or len(viewport_coords) != 4:
-            return jsonify(ok=False, message="viewport should be in format 'lon0,lat0,lon1,lat1'"), 400
+        position_str = request.args.get('position')
+        distance_str = request.args.get('distance')
+        position_coords = None
+        viewport_coords = None
+        distance = 100000
+
+        if not viewport_str and not position_str:
+            return jsonify(ok=False, message="position or viewport cgi is required"), 400
+
+        if position_str:
+            position_coords = [float(x) for x in position_str.split(',')]
+            if len(position_coords) != 2:
+                return jsonify(ok=False, message="position should be in format 'lon0,lat0'"), 400
+            if distance_str:
+                try:
+                    distance = float(distance_str)
+                except:
+                    pass
+
+        if viewport_str:
+            viewport_coords = [float(x) for x in viewport_str.split(',')]
+            if len(viewport_coords) != 4:
+                return jsonify(ok=False, message="viewport should be in format 'lon0,lat0,lon1,lat1'"), 400
 
         sort_close_to = None
         if sort:
             sort_close_to = [(viewport_coords[0] + viewport_coords[2]) / 2, (viewport_coords[1] + viewport_coords[3]) / 2]
-        places = database_reader.get_places_in_rect(viewport_coords, sort_close_to)
+        places = []
+        if viewport_coords:
+            places = database_reader.get_places_in_rect(viewport_coords, sort_close_to)
+        if position_coords:
+            places = database_reader.get_places_near_point(position_coords, distance)
+
         if len(places) == 0:
             return jsonify(ok=True, places=[]), 404
         cities = get_cities(places)
@@ -79,6 +109,7 @@ def list_places():
         )
         return response, 200
     except:
+        raise
         return jsonify(ok=False, message="Server internal error"), 500
 
 @app.route('/')
